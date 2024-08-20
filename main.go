@@ -5,8 +5,9 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func HandleRequest(ctx context.Context) (string, error) {
-	return "hello world", nil
+func HandleRequest(ctx context.Context) (*string, error) {
+	resp := "hello world"
+	return &resp, nil
 }
 
 func main() {
