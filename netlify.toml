@@ -1,9 +1,4 @@
 [build]
-  command = "./build.sh"
+  command = "make build"
   functions = "functions"
   publish = "public"
- 
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/hello/:splat"
-  status = 200
