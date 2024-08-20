@@ -2,4 +2,4 @@
 .PHONY: build
 
 build:
-	@go build -mod=mod -o netlify/functions/hello .
+	@go build -o netlify/functions/hello .
