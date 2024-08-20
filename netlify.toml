@@ -4,3 +4,4 @@
 
 [build.environment]
   GO_IMPORT_PATH = "github.com/tanema/helloWorld"
+	GO111MODULE = "on"
