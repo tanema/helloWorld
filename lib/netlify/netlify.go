@@ -1,5 +1,15 @@
 package netlify
 
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+	"github.com/aws/aws-lambda-go/lambda"
+)
+
 type (
 	Request struct {
 		Resource                        string              `json:"resource"` // The resource path defined in API Gateway
@@ -35,9 +45,9 @@ type (
 		APIID             string                 `json:"apiId"` // The API Gateway rest API Id
 	}
 	Identity struct {
+		CognitoIdentityID             string `json:"cognitoIdentityId,omitempty"`
 		CognitoIdentityPoolID         string `json:"cognitoIdentityPoolId,omitempty"`
 		AccountID                     string `json:"accountId,omitempty"`
-		CognitoIdentityID             string `json:"cognitoIdentityId,omitempty"`
 		Caller                        string `json:"caller,omitempty"`
 		APIKey                        string `json:"apiKey,omitempty"`
 		APIKeyID                      string `json:"apiKeyId,omitempty"`
@@ -56,4 +66,57 @@ type (
 		Body              string              `json:"body"`
 		IsBase64Encoded   bool                `json:"isBase64Encoded,omitempty"`
 	}
+	Handler   func(context.Context, Request) *Response
+	BgHandler func(context.Context, Request) error
 )
+
+func Start(handler Handler) {
+	lambda.Start(func(ctx context.Context, req Request) (*Response, error) {
+		return handler(ctx, req), nil
+	})
+}
+
+func StartBg(handler BgHandler) {
+	lambda.Start(handler)
+}
+
+func Err(err error) *Response {
+	return ErrStatus(http.StatusInternalServerError, err)
+}
+
+func ErrStatus(status int, err error) *Response {
+	return &Response{
+		StatusCode: status,
+		Body:       err.Error(),
+	}
+}
+
+func OK() *Response {
+	return &Response{StatusCode: http.StatusOK}
+}
+
+func Text(payload string) *Response {
+	return TextStatus(http.StatusOK, payload)
+}
+
+func TextStatus(status int, payload string) *Response {
+	return &Response{
+		StatusCode: status,
+		Body:       payload,
+	}
+}
+
+func JSON(payload io.Reader) *Response {
+	return JSONStatus(http.StatusOK, payload)
+}
+
+func JSONStatus(status int, payload io.Reader) *Response {
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return Err(fmt.Errorf("Could not marshal response body: %v", err))
+	}
+	return &Response{
+		StatusCode: status,
+		Body:       string(data),
+	}
+}
