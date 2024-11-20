@@ -1,21 +1,22 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" lang="en"><head>
-	<title>hello</title>
+<html>
+<head>
+  <title>hello</title>
 </head>
 <body>
-		<main>loading...</main>
+  <main>loading...</main>
 <script>
 async function callFn() {
   try {
-		const main = document.getElementsByTagName("main")[0];
+    const main = document.getElementsByTagName("main")[0];
     const response = await fetch("/.netlify/functions/hello");
     if (!response.ok) {
-			main.innerHTML = `Response status: ${response.status}`;
-		} else {
-    	main.innerHTML = await response.text();
-		}
+      main.innerHTML = `Response status: ${response.status}`;
+    } else {
+      main.innerHTML = await response.text();
+    }
   } catch (error) {
-		main.innerHTML = error.message;
+    main.innerHTML = error.message;
   }
 }
 callFn()
